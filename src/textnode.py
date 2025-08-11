@@ -17,7 +17,7 @@ class TextNode:
     def __eq__(self, node):
         return (self.text == node.text and self.text_type == node.text_type and self.url == node.url)
     def __repr__(self):
-        return f"TextNode({self.text}, {self.text_type}, {self.url})"
+        return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
     
 
 def text_node_to_html_node(text_node):
@@ -33,6 +33,6 @@ def text_node_to_html_node(text_node):
         case TextType.LINK:
             return LeafNode(tag="a", value=text_node.text, prop={"href":text_node.url})
         case TextType.IMAGE:
-            return LeafNode(tag="img", value="", prop={"src":text_node.url, "alt":text_node.text})
+            return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
         case _:
             raise Exception("invalid text type")
