@@ -1,5 +1,6 @@
 import shutil
 import os
+from block_markdown import markdown_to_html_node
 
 dir_path_static = "./static"
 dir_path_public = "./public"
@@ -11,6 +12,8 @@ def main():
 
     print("Copying static files to public directory...")
     copy_files_recursive(dir_path_static, dir_path_public)
+
+    generate_page("content/index.md", "template.html", "public/index.html")
 
 
 def copy_files_recursive(source_dir_path, dest_dir_path):
@@ -25,6 +28,30 @@ def copy_files_recursive(source_dir_path, dest_dir_path):
             shutil.copy(from_path, dest_path)
         else:
             copy_files_recursive(from_path, dest_path)
+
+def extract_title(markdown):
+    md_lines = markdown.split("\n")
+    for line in md_lines:
+        if line.startswith("# "):
+            return line[2:]
+    raise ValueError("no title found")
+        
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    with open(from_path) as f:
+        md = f.read()
+    f.close()
+    with open(template_path) as t:
+        template = t.read()
+    t.close()
+    node = markdown_to_html_node(md)
+    HTML_string = node.to_html()
+    title = extract_title(md)
+    template = template.replace("{{ Title }}", title)
+    template = template.replace("{{ Content }}", HTML_string)
+    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+    with open(dest_path, 'w') as d:
+        d.write(template)
 
 if __name__ == "__main__":
     main()
