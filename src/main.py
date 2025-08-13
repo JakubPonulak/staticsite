@@ -7,7 +7,6 @@ from block_markdown import markdown_to_html_node
 dir_path_static = "./static"
 dir_path_public = "./docs"
 
-print(sys.argv)
 if len(sys.argv) == 1:
     basepath = "/"
 else:
@@ -22,7 +21,8 @@ def main():
     copy_files_recursive(dir_path_static, dir_path_public)
 
     # generate_page("content/index.md", "template.html", "public/index.html")
-    generate_pages_recursive(basepath + "content/", basepath + "template.html", basepath + "docs/")
+    # generate_pages_recursive(basepath + "content/", basepath + "template.html", basepath + "docs/")
+    generate_pages_recursive("content/", "template.html", "docs/")
 
 
 
