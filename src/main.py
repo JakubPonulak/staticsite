@@ -13,7 +13,9 @@ def main():
     print("Copying static files to public directory...")
     copy_files_recursive(dir_path_static, dir_path_public)
 
-    generate_page("content/index.md", "template.html", "public/index.html")
+    # generate_page("content/index.md", "template.html", "public/index.html")
+    generate_pages_recursive("content/", "template.html", "public/")
+
 
 
 def copy_files_recursive(source_dir_path, dest_dir_path):
@@ -52,6 +54,28 @@ def generate_page(from_path, template_path, dest_path):
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
     with open(dest_path, 'w') as d:
         d.write(template)
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    with open(template_path) as t:
+        template = t.read()
+    for filename in os.listdir(dir_path_content):
+        file_path = os.path.join(dir_path_content, filename)
+        target_path = os.path.join(dest_dir_path, filename)
+        if not os.path.exists(target_path):
+            os.makedirs(os.path.dirname(target_path), exist_ok=True)
+        if not os.path.isfile(file_path):
+            generate_pages_recursive(file_path, template_path, target_path)
+        else:
+            with open(file_path) as f:
+                md = f.read()
+            node = markdown_to_html_node(md)
+            HTML_string = node.to_html()
+            title = extract_title(md)
+            template_copy = template.replace("{{ Title }}", title)
+            template_copy = template_copy.replace("{{ Content }}", HTML_string)
+            with open(os.path.join(dest_dir_path, "index.html"), 'w') as d:
+                    d.write(template_copy)
+
 
 if __name__ == "__main__":
     main()
